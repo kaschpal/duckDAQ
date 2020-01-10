@@ -2,10 +2,10 @@
 
 #from Display import Display
 from .Multimeter import Multimeter 
-#from .Plotter import Plotter
+from .Plotter import Plotter
 
-# __all__ = ["Display", "Multimeter", "Plotter"]
-__all__ = ["Multimeter"]
+__all__ = ["Display", "Multimeter", "Plotter"]
+
 
 """
 This file is part of duckDAQ.
