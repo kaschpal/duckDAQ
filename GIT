@@ -1,0 +1,4 @@
+git commit -a -m "quick sync"
+git push origin master
+
+github.com/kaschpal/daqjack/archive/master.tar.gz
