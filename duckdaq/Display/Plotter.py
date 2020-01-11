@@ -127,7 +127,7 @@ class Plotter_Filter_Thread(Filter.Filter_Thread):
         mdata = pd.DataFrame( tmparray, columns=["t"] + self.parent.parent.inm.ports)
 
         with self.parent.parent.dflock:
-            self.parent.parent.df = self.parent.parent.df.append(mdata)
+            self.parent.parent.df = self.parent.parent.df.append(mdata, sort=False)
 
     def process(self, data):
         self.__append_to_df(data)
