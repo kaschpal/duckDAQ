@@ -5,24 +5,39 @@ import time
 import duckdaq.util as util
 import duckdaq.Filter as Filter
 from IPython.core.display import display
-        
+
 class Multimeter(widgets.HBox):
+    """
+    Displays the value of the given port in the in_measurement.
+
+    *Arguments*
+        in_measurement : Measurement / VirtualMeasurement
+            Input measuremnt
+        port : String
+            The name of the port to display, has to be in the portlist of
+            in_measurement
+        unit : String
+            The unit, which should be displayed after the value
+
+    *Variables*
+        update_time : int / float
+            Delay in seconds between the updates of the display
+
+    """
     def __init__(self, inm, port, unit="V"):
         super().__init__(layout=widgets.Layout(border="solid", display="flex"))
-        
+
         self.__port_label = widgets.Label(value=port + ":  ")
         self.value_label = widgets.Label()
         self.inm = inm
         self.unit = unit
         self.port = port
-        
+
         self.update_time = 1
-        
         self.children = [self.__port_label, self.value_label]
-        
+
         self.__Filter = Multimeter_Filter(self.inm, self)
         self.__Filter.start()
-
         display(self)
 
 
@@ -40,13 +55,13 @@ class Multimeter_Filter_Thread(Filter.Filter_Thread):
         # look for the desired port to display
         portlist = self.parent.inm.ports
         i = portlist.index(self.parent.parent.port)
-        
+
         t = data[0]   # time is the first entry
         value = data[i+1] # the port is shifted by the time-entry
-        
+
         todisplay = util.round_sig( value, 4 )
         self.parent.parent.value_label.value = str(todisplay) + "   " + str(self.parent.parent.unit)
-    
+
         # update the display one every ?? second
         time.sleep(self.parent.parent.update_time)
         self.parent.parent.inm.queue.queue.clear()
