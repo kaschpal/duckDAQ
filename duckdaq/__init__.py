@@ -8,39 +8,17 @@ if "__DDPATH__" not in locals():     # only at first call
     # sys.path.append( __DDPATH__ + "local-modules" + os.sep)
 
 
-# Qt modules
-#import PySide.QtGui as __QtGui
-#import PySide.QtCore as QtCore
-#import PySide.QtUiTools as QtUiTools
-
 
 # parts of the module
 from . import util
 from .Measurement import Measurement
 from .VirtualMeasurement import VirtualMeasurement
 from . import Filter
-#from . import Display
+from . import Display
 from . import Device
-
 
 __all__ = ["util", "Measurement", "VirtualMeasurement", "Filter", "Device"]
 
-
-# if not already existing, create QApplication
-#if __QtGui.QApplication.instance() is None:
-#    __QApp__ = __QtGui.QApplication([])
-#else:
-#    __QApp__ = __QtGui.QApplication.instance()
-
-
-# used to terminate dd scripts
-#def gui_block():
-#
-#    # block till all qt windows are closed
-#    returncode = __QApp__.exec_()
-#
-#    # exit cleanly
-#    exit( returncode  )
 
 
 """

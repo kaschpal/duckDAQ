@@ -3,7 +3,6 @@
 import math
 import os
 import duckdaq
-#import PySide.QtGui as QtGui
 
 def write_csv(filename, measurement):
     """
@@ -27,14 +26,6 @@ def write_csv(filename, measurement):
     
     if queue.empty() == True:    # not, if nothing in queue
         return
-   
-   # when no filename is given, open dialog to ask for
-    if filename == None:
-        homeDir = os.path.expanduser("~")
-        dialog = QtGui.QFileDialog()
-        dialog.setFileMode(QtGui.QFileDialog.AnyFile)
-        filename = dialog.getSaveFileName(None, "Chose File", homeDir, "CSV (*.csv)")
-        filename = filename[0]
         
     file = open(filename, "w") 
     
@@ -85,14 +76,6 @@ def read_csv(filename, measurement):
         None
     
     """
-   # when no filename is given, open dialog to ask for
-    if filename == None:
-        homeDir = os.path.expanduser("~")
-        dialog = QtGui.QFileDialog()
-        dialog.setFileMode(QtGui.QFileDialog.AnyFile)
-        filename = dialog.getOpenFileName(None, "Chose File", homeDir, "CSV (*.csv)")
-        filename = filename[0]
-   
     file = open(filename, "r") 
     
     lines = file.readlines()    # read entire file 
@@ -149,67 +132,6 @@ def plot(measurement):
     show()
 
 
-def call_qtiplot(measurement):
-    """
-    Opens the data in the queue in QtiPlot. Therefor the queue is saved as csv
-    and a startup script is created, which commands QtiPlot to read in the file.
-    QtiPlot is called via call(), means: blocking.
-
-    *Arguments*
-
-        measurement : Measurement / VirtualMeasurement
-
-    *Returns*
-
-        None
-
-    """
-    queue = measurement.queue
-    ports = measurement.ports
-    
-    if queue.empty() == True:    # only, of data aviable
-        return
-
-    from tempfile import NamedTemporaryFile
-    script = NamedTemporaryFile()   # our script will be a tempfile
-    csv = NamedTemporaryFile()      # to store the data
-    
-    write_csv(csv.name, measurement)            # fill
-    from os import fsync            # flush data to disk, otherwise no content in file
-    csv.flush()
-    fsync(csv.fileno())
-
-    def writeln(line):      # adds a newline
-        script.write(line + "\n") 
-
-    # tablename, columns, rows 
-    writeln("t = newTable(\"daqjack\")") # create table
-
-    #reference:
-    #void PreviewTable::importASCII(
-    # const QString& fname,
-    # const QString & sep,
-    # int  	ignoredLines,
-    # bool  renameCols,
-    # bool  stripSpaces,
-    # bool  simplifySpaces,
-    # bool  importComments,
-    # const QString & commentString,
-    # int   importMode,
-    # const QLocale &  	importLocale,
-    # int  	endLine,
-    # int  	maxRows 
-    #)
-    writeln("t.importASCII(\"{}\", \";\", 0, True, True, False, False)".format(csv.name) )
-
-    script.flush()                  #flush
-    fsync(script.fileno())
-
-    from subprocess import call     # call scidavis, will block
-    call(["qtiplot", "--execute ", script.name])
-    
-    csv.close()
-    script.close()
 
 
 def queueToList(queue):
@@ -292,36 +214,6 @@ def setDataDirection(labjack, portlist):
         if typ == "A":
             labjack.configAnalog(n)
 
-
-
-def uiLoader(widget, file):
-    """
-    Loads a user interface from a qtdesigner file
-    into a widget.
-
-    *Arguments*
-
-        widget : QtGui.QWidget or derived
-            The widget, which should be replaced by the loaded one
-        file : String
-            filename relative to the "ui" directory 
-
-    *Returns*
-        
-        None
-
-    """
-    import PySide.QtCore as QtCore
-    import PySide.QtUiTools as QtUiTools
-
-    # load user interface
-    loader = QtUiTools.QUiLoader()
-    filename = duckdaq.__DDPATH__ + "ui" + os.sep + file
-    file = QtCore.QFile(filename)
-    print(filename)
-    file.open(QtCore.QFile.ReadOnly)
-    loader.load(file, widget)
-    file.close()
 
 
 def round_sig(x, n):
