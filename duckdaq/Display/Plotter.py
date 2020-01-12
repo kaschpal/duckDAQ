@@ -59,21 +59,22 @@ class Plotter(widgets.HBox):
         # first call: create figure
         self.upd_plot = self.__init_plt
 
-        while inm.RUNNING == True:
-            self.upd_plot()
+        while inm.RUNNING == True or self.inm.queue.empty() == False:
             time.sleep(self.update_time)
+            self.upd_plot()
+            
 
     """ First call: create figure """
     def __init_plt(self):
 
         # if there is no data yet, abort
-        if len(self.df.index) == 0:
+        if len(self.df.index) < 2:    # bqplot wants at least **two**
             return
 
         # read data from the filter-thread
         with self.dflock:
-            tt = self.df["t"]     # time-scale
-            yy = self.df[self.ports]
+            tt = self.df["t"].to_numpy()     # time-scale
+            yy = self.df[self.ports].to_numpy()
         yy = yy.transpose()   # is in wrong order
 
         t_scale = bq.LinearScale()
@@ -81,7 +82,9 @@ class Plotter(widgets.HBox):
         ax_y = bq.Axis(scale=y_scale, orientation='vertical', tick_format='0.2f',
                 grid_lines='solid')
         ax_t = bq.Axis(scale=t_scale, grid_lines='solid', label='t in s')
-
+        
+        
+        
         self.lines = bq.Lines(x=tt, y=yy, scales={'x': t_scale, 'y': y_scale},
                  stroke_width=3, display_legend=True, labels=self.ports)
 

@@ -74,17 +74,18 @@ class SpikeWheel_Thread(Filter_Thread):
     def process(self, data):
         t = data[0]
 
+        # if no edge appeared
+        if data[1] == None:
+            return
+        
+        # edge appeared: wheel moved forward
+        ds = self.parent.deltaS
+            
         lastt = self.lastData[0] 
         lasts = self.lastData[1] 
         lastv = self.lastData[2]
-        lasta = self.lastData[3]
-       
-        # if no edge appeared, set deltas=0
-        if data[1] == None:
-            ds = 0
-        else:  # edge appeared: wheel moved forward
-            ds = self.parent.deltaS
-
+        lasta = self.lastData[3]    
+        
         if lastt != None:
             deltat = t - lastt    # time between actual and last data
         
@@ -94,17 +95,10 @@ class SpikeWheel_Thread(Filter_Thread):
             newData[0] = t       # copy time, s
             newData[1] = 0
         elif lastv == None:      # second call, no velocity given
-            #newData[0] = t
-            #newData[1] = lasts + self.parent.deltaS             # s = s_0 + ds
-            #newData[2] = self.parent.deltaS / deltat            # v = ds / dt
             newData[0] = t
             newData[1] = lasts + ds             # s = s_0 + ds
             newData[2] = ds / deltat            # v = ds / dt
         else:
-            #newData[0] = t
-            #newData[1] = lasts + self.parent.deltaS             # s = s_0 + ds
-            #newData[2] = self.parent.deltaS / deltat            # v = ds / dt
-            #newData[3] = (newData[2] - lastv) / deltat           # a = dv / dt
             newData[0] = t
             newData[1] = lasts + ds             # s = s_0 + ds
             newData[2] = ds / deltat            # v = ds / dt
