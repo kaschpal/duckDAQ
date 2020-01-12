@@ -1,0 +1,6 @@
+*.ipynb*
+*__pycache__*
+duckdaq/examples
+venv
+bin
+.idea
