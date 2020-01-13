@@ -4,3 +4,4 @@ duckdaq/examples
 venv
 bin
 .idea
+doc/_build
