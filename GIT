@@ -1,4 +1,7 @@
-git commit -a -m "quick sync"
+git commit -a -m "message"
 git push origin master
+git checkout -b "new branch"   # create new branch
+
+git checkout -- path/to/file   # reset uncommited changes in file
 
 github.com/kaschpal/daqjack/archive/master.tar.gz
