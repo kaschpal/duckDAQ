@@ -5,3 +5,5 @@ venv
 bin
 .idea
 doc/_build
+auswertung.py
+.gitignore
