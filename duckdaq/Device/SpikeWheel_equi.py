@@ -70,78 +70,42 @@ class SpikeWheel_Thread(Filter_Thread):
     def __init__(self, parent):
         Filter_Thread.__init__(self, parent)
         self.lastData = [None, ] * 4         # init
-        self.lastLastData = [None, ] * 4         # init
-        self.process = self.__process_first
     
-
-    def __process_first(self, data):
-        # if no edge appeared
-        if data[1] == None:
-            return
-
+    def process(self, data):
         t = data[0]
-        s = 0
-        v = None
-        a = None
-        
-        newData = [t, s, v ,a]
-        self.parent.outm.queue.put( tuple( newData ) )
-        self.lastLastData = lastData
-        self.lastData = newData
-        self.process = self.__process_second
-    
-    def __process_second(self, data):
+
         # if no edge appeared
         if data[1] == None:
             return
-
+        
+        # edge appeared: wheel moved forward
         ds = self.parent.deltaS
-        l_s = self.lastData[1]
-        l_t = self.lastData[0]
+            
+        lastt = self.lastData[0] 
+        lasts = self.lastData[1] 
+        lastv = self.lastData[2]
+        lasta = self.lastData[3]    
         
-        t = data[0]
-        s = l_s + ds 
-        v = ds / (t - l_t)
-        a = None
+        if lastt != None:
+            deltat = t - lastt    # time between actual and last data
         
-        newData = [t, s, v ,a]
+        newData = [None, ] * 4  # time, s, v, a
+
+        if   lasts == None:      # first call, no lastdistance given
+            newData[0] = t       # copy time, s
+            newData[1] = 0
+        elif lastv == None:      # second call, no velocity given
+            newData[0] = t
+            newData[1] = lasts + ds             # s = s_0 + ds
+            newData[2] = ds / deltat            # v = ds / dt
+        else:
+            newData[0] = t
+            newData[1] = lasts + ds             # s = s_0 + ds
+            newData[2] = ds / deltat            # v = ds / dt
+            newData[3] = (newData[2] - lastv) / deltat           # a = dv / dt
+
+
         self.parent.outm.queue.put( tuple( newData ) )
-        self.lastLastData = lastData
-        self.lastData = newData
-        self.process = self.__process
-    
-
-
-    # default processing
-    def __process(self, data):
-        # if no edge appeared
-        if data[1] == None:
-            return
-
-        ll_t = self.lastLastData[0]
-        l_t = self.lastData[0]
-        ll_s = self.lastLastData[1]
-        l_s = self.lastData[1]
-        #ll_v = self.lastLastData[2]
-        l_v = self.lastData[2]
-        #ll_a = self.lastLastData[3]
-        #l_a = self.lastData[3]
-
-        ds = self.parent.deltaS
-        t = data[0]
-        
-        # s2 = s1 + ds
-        s = l_s + ds
-        
-        # v = (s2 - s0) / (t2 - t0)
-        v = (s - ll_s) / (t - ll_t)
-
-        # a = (v2 - v1) / (t2 - t1)
-        a = (v - l_v) / (t - l_t)
-
-        newData = [t, s, v ,a]
-        self.parent.outm.queue.put( tuple( newData ) )
-        self.lastLastData = lastData
         self.lastData = newData
 
 """
