@@ -44,10 +44,10 @@ class SpikeWheel(Device):
             raise TypeError("SpikeWheel can only be called with a one-port measurement.")
 
         from math import pi
-        perimeter = (diameter * pi) / 1000     # in meters
+        perimeter = (diameter * pi) / 1000.     # in meters
         
         # distance, which is traveled after each change of h/l or l/h
-        self.deltaS = (perimeter / numberOfSpikes) * 2
+        self.deltaS = (perimeter / numberOfSpikes) / 2
 
         self.ainm = self.inm  # give to schmitttriger
 
@@ -86,7 +86,7 @@ class SpikeWheel_Thread(Filter_Thread):
         
         newData = [t, s, v ,a]
         self.parent.outm.queue.put( tuple( newData ) )
-        self.lastLastData = lastData
+        self.lastLastData = self.lastData
         self.lastData = newData
         self.process = self.__process_second
     
@@ -106,7 +106,7 @@ class SpikeWheel_Thread(Filter_Thread):
         
         newData = [t, s, v ,a]
         self.parent.outm.queue.put( tuple( newData ) )
-        self.lastLastData = lastData
+        self.lastLastData = self.lastData
         self.lastData = newData
         self.process = self.__process
     
@@ -141,7 +141,7 @@ class SpikeWheel_Thread(Filter_Thread):
 
         newData = [t, s, v ,a]
         self.parent.outm.queue.put( tuple( newData ) )
-        self.lastLastData = lastData
+        self.lastLastData = self.lastData
         self.lastData = newData
 
 """
